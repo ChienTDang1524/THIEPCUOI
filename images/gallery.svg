@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="galBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#faf5f0"/>
+      <stop offset="50%" stop-color="#f5ebe1"/>
+      <stop offset="100%" stop-color="#eddcd0"/>
+    </linearGradient>
+    <linearGradient id="galGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e7c975"/>
+      <stop offset="50%" stop-color="#c59b27"/>
+      <stop offset="100%" stop-color="#9e7516"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="800" fill="url(#galBg)"/>
+  <rect x="20" y="20" width="560" height="760" fill="none" stroke="url(#galGold)" stroke-width="2" rx="12" stroke-dasharray="6 6"/>
+  
+  <g transform="translate(300, 360) scale(1.6)">
+    <circle cx="0" cy="0" r="36" fill="#fff"/>
+    <path d="M-14 -10 L14 -10 L14 12 L-14 12 Z" fill="none" stroke="url(#galGold)" stroke-width="2" rx="3"/>
+    <circle cx="-6" cy="-4" r="3" fill="url(#galGold)"/>
+    <path d="M-14 8 L-6 -2 L2 5 L8 0 L14 7" fill="none" stroke="url(#galGold)" stroke-width="2"/>
+  </g>
+  
+  <text x="300" y="470" font-family="'Playfair Display', serif" font-size="24" font-weight="bold" fill="#721c24" text-anchor="middle">ẢNH ALBUM CƯỚI</text>
+  <text x="300" y="505" font-family="'Montserrat', sans-serif" font-size="14" fill="#8c7368" text-anchor="middle">Đặt file 'gallery-X.jpg' vào images/</text>
+</svg>

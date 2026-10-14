@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#faece5"/>
+      <stop offset="50%" stop-color="#fdf4f0"/>
+      <stop offset="100%" stop-color="#eed8cf"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e7c975"/>
+      <stop offset="50%" stop-color="#c59b27"/>
+      <stop offset="100%" stop-color="#9e7516"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect x="20" y="20" width="760" height="560" fill="none" stroke="url(#gold)" stroke-width="2" rx="16" stroke-dasharray="8 6"/>
+  
+  <!-- Icon Cặp Đôi / Trái Tim -->
+  <g transform="translate(400, 240) scale(1.5)">
+    <circle cx="0" cy="0" r="48" fill="#fff" filter="drop-shadow(0 4px 12px rgba(197,155,39,0.2))"/>
+    <path d="M0 16l-2-1.8C-9.4 7.6 -14 3.4 -14 -1.8c0-4.2 3.3-7.5 7.5-7.5 2.4 0 4.6 1.1 6.5 2.8 1.9-1.7 4.1-2.8 6.5-2.8 4.2 0 7.5 3.3 7.5 7.5 0 5.2-4.6 9.4-12 16L0 16z" fill="url(#gold)"/>
+  </g>
+  
+  <text x="400" y="370" font-family="'Playfair Display', serif, sans-serif" font-size="28" font-weight="bold" fill="#721c24" text-anchor="middle">KHUNG ẢNH CƯỚI CHÍNH (HERO)</text>
+  <text x="400" y="410" font-family="'Montserrat', sans-serif" font-size="16" fill="#8c7368" text-anchor="middle">Thay bằng ảnh của bạn: đặt file 'hero.jpg' vào thư mục images/</text>
+  <text x="400" y="438" font-family="'Montserrat', sans-serif" font-size="14" fill="#c59b27" text-anchor="middle">Hoặc bấm nút "Tùy chỉnh thiệp" góc phải để chọn ảnh từ máy</text>
+</svg>
