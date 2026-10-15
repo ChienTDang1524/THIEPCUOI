@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let appData = loadCustomData() || WEDDING_DATA;
   applyWeddingData(appData);
 
-  // 2. KHỞI TẠO CÁC TÍNH NĂNG CHÍNH
+  // 2. CÁ NHÂN HÓA TÊN KHÁCH MỜI TỪ URL (?to=Tên_Khách)
+  initPersonalizedGuest();
+
+  // 3. KHỞI TẠO CÁC TÍNH NĂNG CHÍNH
   initEnvelopeOpener();
   initMusicPlayer(appData.music);
   initPetalsCanvas();
@@ -17,8 +20,30 @@ document.addEventListener("DOMContentLoaded", () => {
   initGuestbook();
   initRSVPForm();
   initGiftBanking(appData.banking);
-  initLiveCustomizer(appData);
+
+  // 4. BẢNG QUẢN LÝ TỔNG HỢP (TẠO LINK KHÁCH + SETUP ẢNH & NHẠC)
+  initControlCenter(appData);
 });
+
+/* =========================================================
+   A0. CÁ NHÂN HÓA TÊN KHÁCH MỜI (?to=Tên_Khách)
+   ========================================================= */
+function initPersonalizedGuest() {
+  const params = new URLSearchParams(window.location.search);
+  const rawGuest = params.get("to") || params.get("guest") || params.get("name") || params.get("khach");
+  const guestName = rawGuest ? decodeURIComponent(rawGuest).trim() : "Quý Khách & Gia Đình";
+
+  document.querySelectorAll(".js-guest-name").forEach(el => {
+    el.textContent = guestName;
+  });
+
+  if (rawGuest) {
+    const rsvpName = document.getElementById("rsvp-name");
+    const wishSender = document.getElementById("wish-sender");
+    if (rsvpName && !rsvpName.value) rsvpName.value = guestName;
+    if (wishSender && !wishSender.value) wishSender.value = guestName;
+  }
+}
 
 /* =========================================================
    A. ÁP DỤNG DỮ LIỆU CẤU HÌNH LÊN GIAO DIỆN
@@ -644,43 +669,164 @@ function initGiftBanking(bankingData) {
 }
 
 /* =========================================================
-   J. BẢNG TÙY BIẾN NHANH (LIVE CUSTOMIZER DRAWER)
+   J. BẢNG QUẢN LÝ TỔNG HỢP (CONTROL CENTER)
+   - Tab 1: Tạo link gửi đích danh cho khách (?to=Tên_Khách)
+   - Tab 2: Setup Ảnh (Hero, Groom, Bride)
+   - Tab 3: Setup Nhạc (Chọn bài có sẵn, tải MP3 từ máy)
+   - Tab 4: Cài đặt thông tin & Ngân hàng
    ========================================================= */
-function initLiveCustomizer(currentData) {
-  const settingsBtn = document.getElementById("floating-settings-btn");
-  const drawer = document.getElementById("customizer-drawer");
-  const closeBtn = document.getElementById("customizer-close");
-  const saveBtn = document.getElementById("customizer-save-btn");
-  const resetBtn = document.getElementById("customizer-reset-btn");
+function initControlCenter(currentData) {
+  const modal = document.getElementById("control-modal");
+  const openShareBtn = document.getElementById("floating-share-btn");
+  const openSettingsBtn = document.getElementById("floating-settings-btn");
+  const closeBtn = document.getElementById("control-close-btn");
 
-  if (!settingsBtn || !drawer) return;
+  if (!modal) return;
 
-  settingsBtn.addEventListener("click", () => {
-    drawer.classList.add("active");
-  });
-
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => drawer.classList.remove("active"));
+  function openModalWithTab(tabIndex = 0) {
+    modal.classList.add("active");
+    switchControlTab(tabIndex);
   }
 
-  // Gán giá trị form cài đặt
+  function closeModal() {
+    modal.classList.remove("active");
+  }
+
+  if (openShareBtn) openShareBtn.addEventListener("click", () => openModalWithTab(0));
+  if (openSettingsBtn) openSettingsBtn.addEventListener("click", () => openModalWithTab(1));
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Chuyển tab trong modal
+  const tabBtns = document.querySelectorAll(".control-tab-btn");
+  const tabPanes = document.querySelectorAll(".control-tab-pane");
+
+  window.switchControlTab = function(index) {
+    tabBtns.forEach((btn, i) => btn.classList.toggle("active", i === index));
+    tabPanes.forEach((pane, i) => pane.classList.toggle("active", i === index));
+  };
+
+  tabBtns.forEach((btn, idx) => {
+    btn.addEventListener("click", () => switchControlTab(idx));
+  });
+
+  // TAB 1: TẠO LINK GỬI KHÁCH MỜI
+  const inputGuest = document.getElementById("input-guest-name");
+  const btnGenLink = document.getElementById("btn-generate-guest-link");
+  const resultBox = document.getElementById("guest-link-result-box");
+  const outputLink = document.getElementById("output-guest-link");
+  const btnCopyGuest = document.getElementById("btn-copy-guest-link");
+  const btnPreviewGuest = document.getElementById("btn-open-preview-guest");
+  const btnShareZalo = document.getElementById("btn-share-zalo");
+
+  window.fillGuestName = function(prefix) {
+    if (inputGuest) {
+      inputGuest.value = prefix;
+      inputGuest.focus();
+    }
+  };
+
+  if (btnGenLink && inputGuest) {
+    btnGenLink.addEventListener("click", () => {
+      const name = inputGuest.value.trim();
+      if (!name) {
+        showToast("⚠️ Vui lòng nhập tên người nhận thiệp");
+        inputGuest.focus();
+        return;
+      }
+
+      // LUÔN TẠO LINK ONLINE GITHUB PAGES CÔNG KHAI ĐỂ GỬI KHÁCH MỞ ĐƯỢC
+      let baseUrl = window.location.origin + window.location.pathname;
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:") {
+        baseUrl = "https://chientdang1524.github.io/THIEPCUOI/";
+      }
+      if (!baseUrl.endsWith("/")) baseUrl += "/";
+      const fullLink = `${baseUrl}?to=${encodeURIComponent(name)}`;
+
+      if (outputLink) outputLink.value = fullLink;
+      if (resultBox) resultBox.style.display = "block";
+      if (btnPreviewGuest) btnPreviewGuest.href = `?to=${encodeURIComponent(name)}`;
+      if (btnShareZalo) btnShareZalo.href = `https://zalo.me/share?url=${encodeURIComponent(fullLink)}`;
+
+      showToast(`✨ Đã tạo xong thiệp mời đích danh cho: ${name}!`);
+    });
+  }
+
+  if (btnCopyGuest && outputLink) {
+    btnCopyGuest.addEventListener("click", () => {
+      copyToClipboard(outputLink.value);
+      showToast("📋 Đã sao chép link online! Hãy dán vào Zalo/Messenger gửi khách.");
+    });
+  }
+
+  // TAB 2: SETUP ẢNH CƯỚI (NÉN TỰ ĐỘNG + LIVE THUMBNAIL)
+  setupEnhancedImagePicker("picker-hero-img", "#preview-hero-thumb", ".js-hero-img", "heroImage");
+  setupEnhancedImagePicker("picker-groom-img", "#preview-groom-thumb", ".js-groom-avatar", "groomAvatar");
+  setupEnhancedImagePicker("picker-bride-img", "#preview-bride-thumb", ".js-bride-avatar", "brideAvatar");
+
+  // Khôi phục từng ảnh riêng lẻ
+  document.querySelectorAll(".btn-reset-photo").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      let savedData = loadCustomData() || WEDDING_DATA;
+      if (target === "heroImage") {
+        delete savedData.heroImage;
+        const defaultSrc = "images/hero.jpg";
+        const thumb = document.getElementById("preview-hero-thumb");
+        if (thumb) thumb.src = defaultSrc;
+        setImage(".js-hero-img", defaultSrc, "Ảnh Bìa");
+      } else if (target === "groomAvatar") {
+        if (savedData.groom) delete savedData.groom.avatar;
+        const defaultSrc = "images/groom.jpg";
+        const thumb = document.getElementById("preview-groom-thumb");
+        if (thumb) thumb.src = defaultSrc;
+        setImage(".js-groom-avatar", defaultSrc, "Chú Rể");
+      } else if (target === "brideAvatar") {
+        if (savedData.bride) delete savedData.bride.avatar;
+        const defaultSrc = "images/bride.jpg";
+        const thumb = document.getElementById("preview-bride-thumb");
+        if (thumb) thumb.src = defaultSrc;
+        setImage(".js-bride-avatar", defaultSrc, "Cô Dâu");
+      }
+      localStorage.setItem("wedding_custom_data", JSON.stringify(savedData));
+      showToast("🔄 Đã khôi phục ảnh về mặc định ban đầu");
+    });
+  });
+
+  // Khởi tạo thumbnail nếu đã lưu trong customData
+  if (currentData.heroImage) {
+    const hThumb = document.getElementById("preview-hero-thumb");
+    if (hThumb) hThumb.src = currentData.heroImage;
+  }
+  if (currentData.groom && currentData.groom.avatar) {
+    const gThumb = document.getElementById("preview-groom-thumb");
+    if (gThumb) gThumb.src = currentData.groom.avatar;
+  }
+  if (currentData.bride && currentData.bride.avatar) {
+    const bThumb = document.getElementById("preview-bride-thumb");
+    if (bThumb) bThumb.src = currentData.bride.avatar;
+  }
+
+  // TAB 3: SETUP BÀI HÁT CƯỚI (PRESET + TẢI MP3 TỪ MÁY)
+  initMusicSetupManager(currentData);
+
+  // TAB 4: THÔNG TIN & LƯU
   const inputGroomName = document.getElementById("edit-groom-name");
   const inputBrideName = document.getElementById("edit-bride-name");
   const inputDate = document.getElementById("edit-wedding-date");
   const inputGroomBank = document.getElementById("edit-groom-bank-num");
   const inputBrideBank = document.getElementById("edit-bride-bank-num");
+  const saveBtn = document.getElementById("customizer-save-btn");
+  const resetBtn = document.getElementById("customizer-reset-btn");
 
   if (inputGroomName) inputGroomName.value = currentData.groom.fullName;
   if (inputBrideName) inputBrideName.value = currentData.bride.fullName;
   if (inputDate) inputDate.value = currentData.weddingDate.substring(0, 16);
   if (inputGroomBank) inputGroomBank.value = currentData.banking.groom.accountNumber;
   if (inputBrideBank) inputBrideBank.value = currentData.banking.bride.accountNumber;
-
-  // Lắng nghe chọn ảnh từ máy tính (Image File Upload Preview)
-  setupLocalImagePicker("picker-hero-img", ".js-hero-img");
-  setupLocalImagePicker("picker-groom-img", ".js-groom-avatar");
-  setupLocalImagePicker("picker-bride-img", ".js-bride-avatar");
-  setupLocalMusicPicker("picker-music-file");
 
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
@@ -695,7 +841,7 @@ function initLiveCustomizer(currentData) {
       initCountdownTimer(currentData.weddingDate);
       initGiftBanking(currentData.banking);
 
-      drawer.classList.remove("active");
+      closeModal();
       showToast("💾 Đã lưu thay đổi thông tin thiệp cưới!");
     });
   }
@@ -710,39 +856,244 @@ function initLiveCustomizer(currentData) {
   }
 }
 
-function setupLocalImagePicker(pickerId, targetSelector) {
+/**
+ * Tự động nén và thu nhỏ ảnh bằng HTML5 Canvas để không bao giờ vượt quota localStorage
+ */
+function compressAndResizeImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Xử lý tải ảnh có thumbnail và nén tự động
+ */
+function setupEnhancedImagePicker(pickerId, thumbSelector, targetSelector, storageKey) {
   const picker = document.getElementById(pickerId);
   if (!picker) return;
 
-  picker.addEventListener("change", (e) => {
+  picker.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target.result;
-        setImage(targetSelector, dataUrl, "Ảnh xem trước");
-        showToast("🖼️ Đã cập nhật ảnh xem trước thành công!");
-      };
-      reader.readAsDataURL(file);
+      showToast("⏳ Đang xử lý và tối ưu ảnh...");
+      try {
+        const compressedDataUrl = await compressAndResizeImage(file, 1200, 1200, 0.82);
+
+        // Cập nhật thumbnail trong modal
+        const thumb = document.querySelector(thumbSelector);
+        if (thumb) thumb.src = compressedDataUrl;
+
+        // Cập nhật ảnh trên trang chính
+        setImage(targetSelector, compressedDataUrl, "Ảnh cưới");
+
+        // Lưu vào localStorage
+        let savedData = loadCustomData() || WEDDING_DATA;
+        if (storageKey === "heroImage") savedData.heroImage = compressedDataUrl;
+        if (storageKey === "groomAvatar") {
+          if (!savedData.groom) savedData.groom = {};
+          savedData.groom.avatar = compressedDataUrl;
+        }
+        if (storageKey === "brideAvatar") {
+          if (!savedData.bride) savedData.bride = {};
+          savedData.bride.avatar = compressedDataUrl;
+        }
+
+        try {
+          localStorage.setItem("wedding_custom_data", JSON.stringify(savedData));
+          showToast("🖼️ Đã lưu và cập nhật ảnh cưới thành công!");
+        } catch (storageErr) {
+          console.warn("Storage quota warning:", storageErr);
+          showToast("🖼️ Đã cập nhật ảnh hiển thị trực tiếp!");
+        }
+      } catch (err) {
+        console.error("Lỗi khi xử lý ảnh:", err);
+        showToast("⚠️ Không thể tải ảnh. Vui lòng thử lại!");
+      }
     }
   });
 }
 
-function setupLocalMusicPicker(pickerId) {
-  const picker = document.getElementById(pickerId);
+/**
+ * Quản lý Setup Nhạc Cưới: Nghe thử preset, chọn bài, tải MP3 từ máy
+ */
+function initMusicSetupManager(currentData) {
+  const currentTitleEl = document.getElementById("current-track-title");
+  const testToggleBtn = document.getElementById("btn-toggle-test-music");
+  const testIcon = document.getElementById("test-music-icon");
+  const testText = document.getElementById("test-music-text");
+  const uploadedNameEl = document.getElementById("uploaded-music-name");
   const audio = document.getElementById("wedding-audio");
-  if (!picker || !audio) return;
 
-  picker.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      audio.src = objectUrl;
-      window.weddingSynth.stop();
-      playWeddingMusic();
-      showToast("🎵 Đang phát bài hát: " + file.name);
-    }
+  let savedData = loadCustomData() || WEDDING_DATA;
+  const savedMusic = savedData.music || { title: "Canon in D - Romantic Piano (Bất hủ)", id: "canon-in-d" };
+  if (currentTitleEl) currentTitleEl.textContent = savedMusic.title || "Canon in D - Romantic Piano (Bất hủ)";
+
+  function updateSongListUI(activeId) {
+    document.querySelectorAll(".preset-song-item").forEach(item => {
+      const isCurrent = item.dataset.songId === activeId;
+      item.classList.toggle("active", isCurrent);
+      const selBtn = item.querySelector(".btn-song-select");
+      if (selBtn) selBtn.textContent = isCurrent ? "Đang chọn" : "Chọn bài";
+    });
+  }
+  updateSongListUI(savedMusic.id || "canon-in-d");
+
+  function stopAllPreviews() {
+    document.querySelectorAll(".btn-song-preview").forEach(b => {
+      b.classList.remove("playing");
+      b.textContent = "▶ Nghe thử";
+    });
+    if (audio) audio.pause();
+    window.weddingSynth.stop();
+  }
+
+  // Nút Nghe Thử bài trên từng dòng
+  document.querySelectorAll(".btn-song-preview").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = btn.closest(".preset-song-item");
+      const songId = btn.dataset.previewId;
+      const songUrl = item.dataset.url;
+
+      if (btn.classList.contains("playing")) {
+        stopAllPreviews();
+        return;
+      }
+
+      stopAllPreviews();
+
+      btn.classList.add("playing");
+      btn.textContent = "⏸ Tạm dừng";
+
+      if (songId === "canon-in-d") {
+        if (audio) audio.pause();
+        window.weddingSynth.start();
+      } else if (songUrl) {
+        window.weddingSynth.stop();
+        if (audio) {
+          audio.src = songUrl;
+          audio.play().catch(e => {
+            console.warn("Audio preview fallback:", e);
+            window.weddingSynth.start();
+          });
+        }
+      }
+    });
   });
+
+  // Nút Chọn Bài Này
+  document.querySelectorAll(".btn-song-select").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = btn.closest(".preset-song-item");
+      const songId = btn.dataset.selectId;
+      const titleEl = item.querySelector(".song-title");
+      const songTitle = titleEl ? titleEl.textContent.trim() : "Nhạc Đám Cưới";
+      const songUrl = item.dataset.url;
+
+      let customData = loadCustomData() || WEDDING_DATA;
+      customData.music = {
+        id: songId,
+        title: songTitle,
+        url: songUrl || ""
+      };
+      localStorage.setItem("wedding_custom_data", JSON.stringify(customData));
+
+      if (currentTitleEl) currentTitleEl.textContent = songTitle;
+      updateSongListUI(songId);
+
+      stopAllPreviews();
+      if (songId === "canon-in-d") {
+        if (audio) audio.src = "";
+        window.weddingSynth.start();
+      } else if (songUrl) {
+        if (audio) {
+          audio.src = songUrl;
+          audio.play().catch(() => window.weddingSynth.start());
+        }
+      }
+
+      showToast(`🎵 Đã chọn bài hát: ${songTitle}`);
+    });
+  });
+
+  // Tải file MP3 từ máy
+  const pickerMusic = document.getElementById("picker-music-file");
+  if (pickerMusic) {
+    pickerMusic.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file && audio) {
+        const objectUrl = URL.createObjectURL(file);
+        audio.src = objectUrl;
+        stopAllPreviews();
+        audio.play().catch(err => console.warn(err));
+
+        const fileName = file.name;
+        if (uploadedNameEl) uploadedNameEl.textContent = `✓ ${fileName}`;
+        if (currentTitleEl) currentTitleEl.textContent = `🎵 ${fileName} (File từ máy)`;
+
+        let customData = loadCustomData() || WEDDING_DATA;
+        customData.music = {
+          id: "custom-file",
+          title: fileName,
+          url: objectUrl
+        };
+        localStorage.setItem("wedding_custom_data", JSON.stringify(customData));
+
+        updateSongListUI("custom-file");
+        showToast(`🎶 Đang phát file nhạc: ${fileName}`);
+      }
+    });
+  }
+
+  // Nút nghe thử/tạm dừng bài đang áp dụng trên banner
+  if (testToggleBtn) {
+    testToggleBtn.addEventListener("click", () => {
+      if (testToggleBtn.classList.contains("playing")) {
+        stopAllPreviews();
+        testToggleBtn.classList.remove("playing");
+        if (testIcon) testIcon.textContent = "▶";
+        if (testText) testText.textContent = "Nghe thử";
+      } else {
+        testToggleBtn.classList.add("playing");
+        if (testIcon) testIcon.textContent = "⏸";
+        if (testText) testText.textContent = "Tạm dừng";
+
+        let customData = loadCustomData() || WEDDING_DATA;
+        const currentMusic = customData.music || { id: "canon-in-d" };
+        if (currentMusic.id === "canon-in-d" || !audio.src) {
+          window.weddingSynth.start();
+        } else {
+          audio.play().catch(() => window.weddingSynth.start());
+        }
+      }
+    });
+  }
 }
 
 function loadCustomData() {
