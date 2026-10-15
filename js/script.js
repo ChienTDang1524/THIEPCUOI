@@ -439,8 +439,8 @@ function initPetalsCanvas() {
 function initCountdownTimer(targetDateStr) {
   const daysEl = document.getElementById("cd-days");
   const hoursEl = document.getElementById("cd-hours");
-  const minsEl = document.getElementById("cd-mins");
-  const secsEl = document.getElementById("cd-secs");
+  const minsEl = document.getElementById("cd-minutes") || document.getElementById("cd-mins");
+  const secsEl = document.getElementById("cd-seconds") || document.getElementById("cd-secs");
 
   if (!daysEl || !hoursEl || !minsEl || !secsEl) return;
 
@@ -477,11 +477,11 @@ function initCountdownTimer(targetDateStr) {
    F. ALBUM ẢNH CƯỚI & PHÓNG TO (LIGHTBOX)
    ========================================================= */
 function initGalleryLightbox() {
-  const modal = document.getElementById("lightbox-modal");
+  const modal = document.getElementById("lightbox") || document.getElementById("lightbox-modal");
   const modalImg = document.getElementById("lightbox-img");
-  const closeBtn = document.getElementById("lightbox-close");
-  const prevBtn = document.getElementById("lightbox-prev");
-  const nextBtn = document.getElementById("lightbox-next");
+  const closeBtn = document.getElementById("lightbox-close") || document.querySelector(".lightbox-close");
+  const prevBtn = document.getElementById("lightbox-prev") || document.querySelector(".lightbox-prev");
+  const nextBtn = document.getElementById("lightbox-next") || document.querySelector(".lightbox-next");
   const galleryItems = document.querySelectorAll(".gallery-item img");
 
   if (!modal || !modalImg || galleryItems.length === 0) return;
@@ -549,7 +549,7 @@ const DEFAULT_WISHES = [
     sender: "Thu Trang",
     relation: "Đồng nghiệp cô dâu",
     time: "Hôm qua",
-    message: "Chúc mừng Khánh Linh xinh đẹp đã tìm được bến đỗ bình yên. Chúc hai vợ chồng luôn ngọt ngào như ngày đầu!"
+    message: "Chúc mừng Kim Oanh xinh đẹp và anh Đăng Chiến! Chúc hai vợ chồng luôn ngọt ngào và hạnh phúc bền lâu!"
   },
   {
     sender: "Gia đình Bác Thành",
