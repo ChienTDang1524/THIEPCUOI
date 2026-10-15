@@ -306,44 +306,64 @@ function initPetalsCanvas() {
     height = canvas.height = window.innerHeight;
   });
 
-  const petals = [];
-  const petalCount = 28;
+  const particles = [];
+  const particleCount = 38;
 
-  // Màu cánh hoa hồng phấn và vàng nhạt
-  const colors = [
-    "rgba(255, 182, 193, 0.75)",
-    "rgba(255, 192, 203, 0.65)",
-    "rgba(247, 215, 215, 0.7)",
-    "rgba(255, 228, 225, 0.6)",
-    "rgba(235, 195, 130, 0.5)"
+  const pinkColors = [
+    "rgba(255, 105, 180, 0.7)",
+    "rgba(255, 133, 162, 0.75)",
+    "rgba(255, 182, 193, 0.8)",
+    "rgba(255, 192, 203, 0.85)",
+    "rgba(255, 218, 224, 0.7)"
   ];
 
-  class Petal {
+  const goldColors = [
+    "rgba(255, 215, 0, 0.9)",
+    "rgba(255, 223, 100, 0.85)",
+    "rgba(254, 205, 120, 0.8)"
+  ];
+
+  class BlingParticle {
     constructor() {
       this.reset(true);
     }
 
     reset(initial = false) {
       this.x = Math.random() * width;
-      this.y = initial ? Math.random() * height : -20;
-      this.size = Math.random() * 12 + 8;
-      this.speedY = Math.random() * 1.5 + 0.8;
+      this.y = initial ? Math.random() * height : -25;
+      this.size = Math.random() * 10 + 6;
+      this.speedY = Math.random() * 1.3 + 0.6;
       this.speedX = Math.random() * 1.2 - 0.6;
       this.rotation = Math.random() * 360;
-      this.rotationSpeed = Math.random() * 2 - 1;
-      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.rotationSpeed = Math.random() * 2.5 - 1.25;
+      
+      const rand = Math.random();
+      if (rand < 0.38) {
+        this.type = "sparkle"; // Ngôi sao lấp lánh ✨
+        this.color = goldColors[Math.floor(Math.random() * goldColors.length)];
+      } else if (rand < 0.65) {
+        this.type = "heart"; // Trái tim hồng 💕
+        this.color = pinkColors[Math.floor(Math.random() * pinkColors.length)];
+      } else {
+        this.type = "petal"; // Cánh hoa hồng 🌸
+        this.color = pinkColors[Math.floor(Math.random() * pinkColors.length)];
+      }
+
+      this.twinkle = Math.random() * Math.PI * 2;
+      this.twinkleSpeed = Math.random() * 0.08 + 0.04;
       this.oscillationSpeed = Math.random() * 0.03 + 0.01;
-      this.oscillationDistance = Math.random() * 2 + 1;
+      this.oscillationDistance = Math.random() * 2.5 + 1;
       this.angle = Math.random() * Math.PI * 2;
     }
 
     update() {
       this.angle += this.oscillationSpeed;
+      this.twinkle += this.twinkleSpeed;
       this.x += Math.sin(this.angle) * this.oscillationDistance + this.speedX;
       this.y += this.speedY;
       this.rotation += this.rotationSpeed;
 
-      if (this.y > height + 20 || this.x < -20 || this.x > width + 20) {
+      if (this.y > height + 25 || this.x < -25 || this.x > width + 25) {
         this.reset();
       }
     }
@@ -353,24 +373,57 @@ function initPetalsCanvas() {
       ctx.translate(this.x, this.y);
       ctx.rotate((this.rotation * Math.PI) / 180);
 
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.bezierCurveTo(this.size / 2, -this.size / 2, this.size, 0, 0, this.size * 1.4);
-      ctx.bezierCurveTo(-this.size, 0, -this.size / 2, -this.size / 2, 0, 0);
-      ctx.fillStyle = this.color;
-      ctx.fill();
+      // Độ nhấp nháy lung linh
+      const alphaScale = 0.5 + 0.5 * Math.sin(this.twinkle);
+      ctx.globalAlpha = Math.max(0.2, alphaScale);
+
+      if (this.type === "sparkle") {
+        // Vẽ ngôi sao 4 cánh lấp lánh bling bling ✨
+        const r = this.size * 1.1;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(0, -r);
+        ctx.quadraticCurveTo(0, 0, r, 0);
+        ctx.quadraticCurveTo(0, 0, 0, r);
+        ctx.quadraticCurveTo(0, 0, -r, 0);
+        ctx.quadraticCurveTo(0, 0, 0, -r);
+        ctx.fill();
+
+        // Tâm vàng óng ánh
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.28, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (this.type === "heart") {
+        // Vẽ trái tim nhỏ dễ thương 💕
+        const s = this.size * 0.65;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(0, s * 0.3);
+        ctx.bezierCurveTo(-s, -s * 0.7, -s * 1.5, s * 0.3, 0, s * 1.6);
+        ctx.bezierCurveTo(s * 1.5, s * 0.3, s, -s * 0.7, 0, s * 0.3);
+        ctx.fill();
+      } else {
+        // Vẽ cánh hoa mềm mại 🌸
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(this.size / 2, -this.size / 2, this.size, 0, 0, this.size * 1.4);
+        ctx.bezierCurveTo(-this.size, 0, -this.size / 2, -this.size / 2, 0, 0);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
 
       ctx.restore();
     }
   }
 
-  for (let i = 0; i < petalCount; i++) {
-    petals.push(new Petal());
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new BlingParticle());
   }
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
-    petals.forEach(p => {
+    particles.forEach(p => {
       p.update();
       p.draw();
     });
