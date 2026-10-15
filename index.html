@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#264336">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Thiệp Cưới Online - Trần Thị Kim Oanh & Trịnh Đăng Chiến</title>
+  <meta name="description" content="Trân trọng kính mời quý khách tới dự Lễ thành hôn & Bữa cơm thân mật của Trần Thị Kim Oanh & Trịnh Đăng Chiến tại Ninh Bình.">
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Favicon Chữ Song Hỷ -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232d4a3e'><circle cx='12' cy='12' r='10' fill='%23edf4ee'/><text x='12' y='17' font-size='14' text-anchor='middle' font-family='serif' fill='%232d4a3e' font-weight='bold'>囍</text></svg>">
+</head>
+<body>
+
+  <!-- CANVAS LÁ BẠCH ĐÀN & PHÁO GIẤY -->
+  <canvas id="petals-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ÂM THANH NỀN -->
+  <audio id="wedding-audio" loop preload="auto"></audio>
+
+  <!-- NÚT PHÁT NHẠC NỔI GÓC MÀN HÌNH -->
+  <button id="floating-music-btn" class="floating-music-btn" title="Bật / Tắt Nhạc Nền">
+    <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+  </button>
+
+  <!-- NÚT TẠO LINK GỬI KHÁCH NỔI TRÊN MÀN HÌNH -->
+  <button id="floating-share-btn" class="floating-share-btn" title="Ghi tên người nhận để tạo link riêng gửi khách">
+    <span>✉️</span>
+    <span>Tạo link gửi khách</span>
+  </button>
+
+  <!-- NÚT CÀI ĐẶT / SETUP ẢNH & NHẠC -->
+  <button id="floating-settings-btn" class="floating-settings-btn" title="Setup ảnh, nhạc và cài đặt">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    <span>Setup & Cài đặt</span>
+  </button>
+
+  <!-- =========================================================
+       1. MÀN HÌNH MỞ PHONG BÌ HOÀNG GIA (ENVELOPE SCREEN)
+       ========================================================= -->
+  <div id="envelope-overlay" class="envelope-overlay">
+    <div class="envelope-wrap">
+      <div class="envelope-card">
+        <div class="envelope-decor-border"></div>
+
+        <!-- Biểu tượng Song Hỷ (囍) với cành lá -->
+        <div class="song-hy-badge" style="margin-bottom: 6px;">
+          <svg class="song-hy-leaf" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-4.4 3.6-8 8-8 1.5 0 3 .2 4.4.6C16.6 3.8 13.5 2 12 2z"/></svg>
+          <div class="song-hy-circle">囍</div>
+          <svg class="song-hy-leaf" viewBox="0 0 24 24" style="transform: scaleX(-1);"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-4.4 3.6-8 8-8 1.5 0 3 .2 4.4.6C16.6 3.8 13.5 2 12 2z"/></svg>
+        </div>
+
+        <div class="envelope-top-badge">TRÂN TRỌNG KÍNH MỜI</div>
+
+        <!-- HỘP HIỂN THỊ ĐÍCH DANH TÊN KHÁCH MỜI -->
+        <div class="envelope-guest-box">
+          <span class="envelope-guest-label">Kính gửi:</span>
+          <div class="envelope-guest-name js-guest-name">Quý Khách & Gia Đình</div>
+        </div>
+
+        <div style="font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin-top: -2px;">
+          Tới dự bữa cơm thân mật cùng gia đình & Lễ thành hôn
+        </div>
+
+        <div class="envelope-names">
+          <div class="envelope-groom-bride js-bride-short">Kim Oanh</div>
+          <span class="envelope-and">🌿 & 🌿</span>
+          <div class="envelope-groom-bride js-groom-short">Đăng Chiến</div>
+        </div>
+
+        <div class="envelope-date js-envelope-date">Thứ Tư, 18 Tháng 11 Năm 2026</div>
+
+        <button id="open-invitation-btn" class="wax-seal-btn" title="Chạm để mở thiệp">
+          <div class="wax-seal-inner">
+            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span class="wax-seal-text">Mở Thiệp</span>
+          </div>
+        </button>
+
+        <p class="envelope-prompt">Chạm vào con dấu để mở thiệp cưới</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       2. HERO SECTION (BANNER ĐẦU TRANG THEO THIỆP MẪU)
+       ========================================================= -->
+  <header id="hero" class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      
+      <!-- Biểu tượng Song Hỷ (囍) với cành lá -->
+      <div class="song-hy-badge">
+        <svg class="song-hy-leaf" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-4.4 3.6-8 8-8 1.5 0 3 .2 4.4.6C16.6 3.8 13.5 2 12 2z"/></svg>
+        <div class="song-hy-circle">囍</div>
+        <svg class="song-hy-leaf" viewBox="0 0 24 24" style="transform: scaleX(-1);"><path d="M12 2C6.5 2 2 6.5 2 12c0 3.5 1.8 6.6 4.6 8.4C6.2 19 6 17.5 6 16c0-4.4 3.6-8 8-8 1.5 0 3 .2 4.4.6C16.6 3.8 13.5 2 12 2z"/></svg>
+      </div>
+
+      <div class="hero-invitation-badge">LỄ THÀNH HÔN</div>
+
+      <!-- LỜI CHÀO ĐÍCH DANH KHÁCH MỜI TRÊN HERO -->
+      <div class="hero-guest-welcome">
+        <span class="hero-guest-label">Trân trọng kính mời</span>
+        <span class="hero-guest-name js-guest-name">Quý Khách & Gia Đình</span>
+      </div>
+
+      <div style="font-size: 0.95rem; color: var(--text-muted); font-style: italic; margin-bottom: 14px;">
+        Đến dự lễ thành hôn và chung vui cùng gia đình chúng tôi
+      </div>
+
+      <!-- TÊN CẶP ĐÔI THEO PHÔNG CHỮ THIỆP MẪU -->
+      <h1 class="hero-title">
+        <span class="hero-bride-name js-bride-name">Trần Thị Kim Oanh</span>
+        <span class="hero-ampersand">&</span>
+        <span class="hero-groom-name js-groom-name">Trịnh Đăng Chiến</span>
+      </h1>
+
+      <!-- KHUNG ẢNH CƯỚI CHÍNH -->
+      <div class="hero-image-frame">
+        <img class="js-hero-img" src="images/hero.jpg" alt="Ảnh cưới Kim Oanh & Đăng Chiến">
+      </div>
+
+      <div class="hero-date-block">
+        <div class="hero-date-text js-display-date">Thứ Tư, 18 Tháng 11 Năm 2026</div>
+        <div class="hero-lunar-date js-lunar-date">Tức ngày 10 tháng 10 năm Bính Ngọ (Âm Lịch)</div>
+      </div>
+
+      <!-- BỘ ĐẾM NGƯỢC THỜI GIAN -->
+      <div class="countdown-box">
+        <div class="countdown-item">
+          <span id="cd-days" class="countdown-num">00</span>
+          <span class="countdown-label">Ngày</span>
+        </div>
+        <div class="countdown-item">
+          <span id="cd-hours" class="countdown-num">00</span>
+          <span class="countdown-label">Giờ</span>
+        </div>
+        <div class="countdown-item">
+          <span id="cd-minutes" class="countdown-num">00</span>
+          <span class="countdown-label">Phút</span>
+        </div>
+        <div class="countdown-item">
+          <span id="cd-seconds" class="countdown-num">00</span>
+          <span class="countdown-label">Giây</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       3. COUPLE SECTION (GIỚI THIỆU CÔ DÂU & CHÚ RỂ - GIA ĐÌNH HAI HỌ)
+       ========================================================= -->
+  <section id="couple" class="couple-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Hôn Nhân Hòa Hợp</span>
+        <h2 class="section-title">Gia Đình Hai Họ</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+      </div>
+
+      <div class="couple-grid">
+        <!-- NHÀ GÁI (CÔ DÂU) -->
+        <div class="couple-card">
+          <div class="couple-avatar-wrap">
+            <img class="couple-avatar js-bride-avatar" src="images/bride.jpg" alt="Cô Dâu Trần Thị Kim Oanh">
+            <span class="couple-role-badge">Nhà Gái • Cô Dâu</span>
+          </div>
+          <h3 class="couple-name js-bride-full">Trần Thị Kim Oanh</h3>
+          <div class="couple-parents">
+            <strong>Trưởng Nữ của:</strong><br>
+            <span class="js-bride-parents">Ông Trần Văn Cương & Bà Nguyễn Thị Ngọc</span>
+          </div>
+          <div class="couple-address">
+            📍 <span class="js-bride-address">32 Ngõ 124 Lương Văn Thăng, Phường Hoa Lư, tỉnh Ninh Bình</span>
+          </div>
+          <p class="couple-bio js-bride-bio">
+            "Cảm ơn anh vì đã luôn yêu thương, chở che và là bến đỗ bình yên nhất của cuộc đời em."
+          </p>
+          <a class="couple-phone js-bride-phone" href="tel:0987654321">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24 11.72 11.72 0 003.68.59 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.72 11.72 0 00.59 3.68 1 1 0 01-.24 1.02l-2.23 2.09z"/></svg>
+            <span>Gọi Cô Dâu</span>
+          </a>
+        </div>
+
+        <!-- NHÀ TRAI (CHÚ RỂ) -->
+        <div class="couple-card">
+          <div class="couple-avatar-wrap">
+            <img class="couple-avatar js-groom-avatar" src="images/groom.jpg" alt="Chú Rể Trịnh Đăng Chiến">
+            <span class="couple-role-badge">Nhà Trai • Chú Rể</span>
+          </div>
+          <h3 class="couple-name js-groom-full">Trịnh Đăng Chiến</h3>
+          <div class="couple-parents">
+            <strong>Trưởng Nam của:</strong><br>
+            <span class="js-groom-parents">Ông Trịnh Đăng Thiện & Bà Đỗ Thị Oanh</span>
+          </div>
+          <div class="couple-address">
+            📍 <span class="js-groom-address">15 Ngõ 12 Đinh Tiên Hoàng, Phường Hoa Lư, tỉnh Ninh Bình</span>
+          </div>
+          <p class="couple-bio js-groom-bio">
+            "Điều may mắn nhất cuộc đời anh là gặp em và cùng em xây đắp một mái ấm vẹn tròn hạnh phúc."
+          </p>
+          <a class="couple-phone js-groom-phone" href="tel:0912345678">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24 11.72 11.72 0 003.68.59 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.72 11.72 0 00.59 3.68 1 1 0 01-.24 1.02l-2.23 2.09z"/></svg>
+            <span>Gọi Chú Rể</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       4. EVENTS / SCHEDULE SECTION (TIỆC MỪNG & HÔN LỄ CHÍNH XÁC)
+       ========================================================= -->
+  <section id="events" class="events-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Chương Trình Hôn Lễ</span>
+        <h2 class="section-title">Thời Gian & Địa Điểm</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+      </div>
+
+      <div class="events-grid">
+        <!-- SỰ KIỆN 1: NHÀ GÁI (17/11/2026) -->
+        <div class="event-card">
+          <span class="event-badge">NHÀ GÁI • VU QUY</span>
+          <h3 class="event-title">Bữa Cơm Thân Mật & Tiệc Mừng</h3>
+          <div class="event-time-row">
+            <span class="event-time-box">10:30</span>
+            <div class="event-date-box">
+              <strong>THỨ BA, 17/11/2026</strong><br>
+              <small>(Ngày 9 tháng 10 năm Bính Ngọ)</small>
+            </div>
+          </div>
+          <div class="event-location">TẠI TƯ GIA NHÀ GÁI</div>
+          <p class="event-address">
+            32 Ngõ 124 Lương Văn Thăng, Phường Hoa Lư, tỉnh Ninh Bình
+          </p>
+          <div class="event-actions">
+            <a class="btn-primary" href="https://maps.google.com/?q=32+Ngo+124+Luong+Van+Thang+Hoa+Lu+Ninh+Binh" target="_blank" rel="noopener">
+              <span>📍 Chỉ Đường Google Maps</span>
+            </a>
+            <button class="btn-secondary" onclick="copyAddress('32 Ngõ 124 Lương Văn Thăng, Phường Hoa Lư, tỉnh Ninh Bình')">
+              <span>📋 Sao Chép Địa Chỉ</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SỰ KIỆN 2: NHÀ TRAI (18/11/2026) -->
+        <div class="event-card">
+          <span class="event-badge">NHÀ TRAI • THÀNH HÔN</span>
+          <h3 class="event-title">Lễ Thành Hôn & Bữa Cơm Thân Mật</h3>
+          <div class="event-time-row">
+            <span class="event-time-box">07:00</span>
+            <div class="event-date-box">
+              <strong>THỨ TƯ, 18/11/2026</strong><br>
+              <small>(Ngày 10 tháng 10 năm Bính Ngọ)</small>
+            </div>
+          </div>
+          <div class="event-location">TẠI TƯ GIA NHÀ TRAI</div>
+          <p class="event-address">
+            15 Ngõ 12 Đinh Tiên Hoàng, Phường Hoa Lư, tỉnh Ninh Bình
+          </p>
+          <div class="event-actions">
+            <a class="btn-primary" href="https://maps.google.com/?q=15+Ngo+12+Dinh+Tien+Hoang+Hoa+Lu+Ninh+Binh" target="_blank" rel="noopener">
+              <span>📍 Chỉ Đường Google Maps</span>
+            </a>
+            <button class="btn-secondary" onclick="copyAddress('15 Ngõ 12 Đinh Tiên Hoàng, Phường Hoa Lư, tỉnh Ninh Bình')">
+              <span>📋 Sao Chép Địa Chỉ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       5. PHOTO GALLERY (ALBUM ẢNH CƯỚI)
+       ========================================================= -->
+  <section id="gallery" class="gallery-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Khoảnh Khắc Ngọt Ngào</span>
+        <h2 class="section-title">Album Kỷ Niệm</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item" data-index="0">
+          <img src="images/gallery-1.jpg" alt="Ảnh cưới 1" onerror="this.src='images/gallery.svg'">
+        </div>
+        <div class="gallery-item" data-index="1">
+          <img src="images/gallery-2.jpg" alt="Ảnh cưới 2" onerror="this.src='images/gallery.svg'">
+        </div>
+        <div class="gallery-item" data-index="2">
+          <img src="images/gallery-3.jpg" alt="Ảnh cưới 3" onerror="this.src='images/gallery.svg'">
+        </div>
+        <div class="gallery-item" data-index="3">
+          <img src="images/gallery-4.jpg" alt="Ảnh cưới 4" onerror="this.src='images/gallery.svg'">
+        </div>
+        <div class="gallery-item" data-index="4">
+          <img src="images/gallery-5.jpg" alt="Ảnh cưới 5" onerror="this.src='images/gallery.svg'">
+        </div>
+        <div class="gallery-item" data-index="5">
+          <img src="images/gallery-6.jpg" alt="Ảnh cưới 6" onerror="this.src='images/gallery.svg'">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       6. LIGHTBOX XEM ẢNH PHÓNG TO
+       ========================================================= -->
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-close">&times;</button>
+    <button class="lightbox-prev">&#10094;</button>
+    <button class="lightbox-next">&#10095;</button>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="Ảnh cưới xem chi tiết">
+    </div>
+  </div>
+
+  <!-- =========================================================
+       7. LOVE STORY (CÂU CHUYỆN TÌNH YÊU)
+       ========================================================= -->
+  <section id="story" class="story-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Hành Trình Hạnh Phúc</span>
+        <h2 class="section-title">Câu Chuyện Của Chúng Mình</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+      </div>
+
+      <div class="story-timeline">
+        <div class="story-item">
+          <div class="story-year">2021</div>
+          <div class="story-card">
+            <h4>Lần Đầu Gặp Gỡ</h4>
+            <p>Khoảnh khắc hai ánh mắt chạm nhau tại Ninh Bình thân thương, câu chuyện tình yêu bình yên và ngọt ngào bắt đầu đơm hoa.</p>
+          </div>
+        </div>
+        <div class="story-item">
+          <div class="story-year">2023</div>
+          <div class="story-card">
+            <h4>Chính Thức Yêu Nhau</h4>
+            <p>Cùng nhau trải qua những ngày tháng thanh xuân rực rỡ, sẻ chia từng niềm vui và nỗi buồn trong cuộc sống.</p>
+          </div>
+        </div>
+        <div class="story-item">
+          <div class="story-year">2025</div>
+          <div class="story-card">
+            <h4>Lời Cầu Hôn Ngọt Ngào</h4>
+            <p>Lời hứa chân thành sẽ cùng nhau nắm tay đi qua mọi giông bão để xây dựng một mái ấm vẹn tròn.</p>
+          </div>
+        </div>
+        <div class="story-item">
+          <div class="story-year">2026</div>
+          <div class="story-card">
+            <h4>Ngày Chung Đôi</h4>
+            <p>Chính thức về chung một mái nhà trong sự chúc phúc trọn vẹn của hai bên gia đình và bạn bè thân quý.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       8. GUESTBOOK (LƯU BÚT CHÚC MỪNG)
+       ========================================================= -->
+  <section id="guestbook" class="guestbook-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Gửi Gắm Yêu Thương</span>
+        <h2 class="section-title">Sổ Lưu Bút</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+      </div>
+
+      <div class="guestbook-wrap">
+        <form id="wish-form" class="wish-form">
+          <h3 class="form-title">Gửi Lời Chúc Đến Cặp Đôi</h3>
+          <div class="form-group">
+            <label class="form-label" for="wish-sender">Họ và tên của bạn:</label>
+            <input type="text" id="wish-sender" class="form-input" placeholder="Ví dụ: Anh Tuấn, Cô Mai..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="wish-relation">Bạn là khách của:</label>
+            <select id="wish-relation" class="form-input">
+              <option value="Bạn của Chú rể">Bạn của Chú rể (Đăng Chiến)</option>
+              <option value="Bạn của Cô dâu">Bạn của Cô dâu (Kim Oanh)</option>
+              <option value="Họ hàng Nhà trai">Họ hàng Nhà trai</option>
+              <option value="Họ hàng Nhà gái">Họ hàng Nhà gái</option>
+              <option value="Đồng nghiệp / Bạn bè">Đồng nghiệp / Bạn bè chung</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="wish-message">Lời chúc ngọt ngào của bạn:</label>
+            <textarea id="wish-message" class="form-input" rows="3" placeholder="Chúc hai bạn trăm năm hạnh phúc, thuận vợ thuận chồng..." required></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 13px;">
+            <span>💌 Gửi Lời Chúc Mừng</span>
+          </button>
+        </form>
+
+        <div class="wishes-list-wrap">
+          <h3 class="form-title">Lời Chúc Từ Người Thân & Bạn Bè</h3>
+          <div id="wishes-list" class="wishes-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       9. FORM XÁC NHẬN THAM DỰ (RSVP)
+       ========================================================= -->
+  <section id="rsvp" class="rsvp-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Đón Tiếp Chu Đáo</span>
+        <h2 class="section-title">Xác Nhận Tham Dự (RSVP)</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+        <p class="section-desc">
+          Để gia đình chuẩn bị đón tiếp quý khách một cách chu đáo và trang trọng nhất, xin vui lòng gửi phản hồi trước ngày cưới:
+        </p>
+      </div>
+
+      <div class="rsvp-card">
+        <form id="rsvp-form">
+          <div class="form-group">
+            <label class="form-label" for="rsvp-name">Họ và tên của bạn:</label>
+            <input type="text" id="rsvp-name" class="form-input" placeholder="Ví dụ: Trần Văn Nam" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="rsvp-guests">Số lượng người tham dự:</label>
+            <select id="rsvp-guests" class="form-input">
+              <option value="1">1 người</option>
+              <option value="2">2 người</option>
+              <option value="3">3 người</option>
+              <option value="Cả gia đình">Cả gia đình</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="rsvp-side">Bạn tham dự tiệc của:</label>
+            <select id="rsvp-side" class="form-input">
+              <option value="nhà trai">Tiệc Nhà Trai (18/11 tại 15 Đinh Tiên Hoàng)</option>
+              <option value="nhà gái">Tiệc Nhà Gái (17/11 tại 32 Lương Văn Thăng)</option>
+              <option value="cả hai">Tham dự cả hai tiệc</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bạn có thể tham dự được không?</label>
+            <div class="rsvp-radio-group">
+              <div class="rsvp-radio-card selected">
+                <input type="radio" id="rsvp-yes" name="attending" value="yes" checked>
+                <label for="rsvp-yes">
+                  <strong>🎉 Chắc chắn sẽ đến</strong>
+                  <small>Rất háo hức chung vui cùng hai bạn!</small>
+                </label>
+              </div>
+              <div class="rsvp-radio-card">
+                <input type="radio" id="rsvp-no" name="attending" value="no">
+                <label for="rsvp-no">
+                  <strong>💌 Rất tiếc bận việc</strong>
+                  <small>Xin gửi lời chúc phúc từ phương xa!</small>
+                </label>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 13px;">
+            <span>✨ Gửi Xác Nhận Tham Dự</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       10. MỪNG CƯỚI / TÀI KHOẢN NGÂN HÀNG & MÃ QR (GIFT/BANKING)
+       ========================================================= -->
+  <section id="gift" class="gift-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Gửi Gắm Tấm Lòng</span>
+        <h2 class="section-title">Hộp Mừng Cưới</h2>
+        <div class="section-divider">
+          <span>🌿</span>
+          <div class="divider-line"></div>
+          <span>囍</span>
+          <div class="divider-line"></div>
+          <span>🌿</span>
+        </div>
+        <p class="section-desc">
+          Sự hiện diện của quý khách là món quà ý nghĩa nhất. Nếu muốn gửi quà mừng từ xa, quý khách có thể gửi qua tài khoản ngân hàng dưới đây:
+        </p>
+      </div>
+
+      <div class="gift-tabs">
+        <button id="tab-groom" class="gift-tab-btn active">
+          🤵 Chú Rể (Đăng Chiến)
+        </button>
+        <button id="tab-bride" class="gift-tab-btn">
+          👰 Cô Dâu (Kim Oanh)
+        </button>
+      </div>
+
+      <div class="gift-card">
+        <div class="gift-qr-wrap">
+          <img id="bank-qr-img" src="images/qr.jpg" alt="Mã QR Mừng Cưới" onerror="this.src='https://img.vietqr.io/image/970422-0912345678-compact2.png'">
+          <div class="gift-qr-scan-text">Quét mã QR qua app ngân hàng</div>
+        </div>
+        <div class="gift-info-wrap">
+          <div class="gift-row">
+            <span class="gift-label">Ngân Hàng:</span>
+            <span id="bank-name" class="gift-value">MBBank (Quân Đội)</span>
+          </div>
+          <div class="gift-row">
+            <span class="gift-label">Số Tài Khoản:</span>
+            <span id="bank-account" class="gift-value highlight">0912345678</span>
+          </div>
+          <div class="gift-row">
+            <span class="gift-label">Chủ Tài Khoản:</span>
+            <span id="bank-owner" class="gift-value">TRINH DANG CHIEN</span>
+          </div>
+          <button id="btn-copy-account" class="btn-primary" style="margin-top: 14px; width: 100%; justify-content: center;">
+            <span>📋 Sao Chép Số Tài Khoản</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-hy">囍</div>
+      <div class="footer-names">
+        <span class="js-footer-bride">Kim Oanh</span> & <span class="js-footer-groom">Đăng Chiến</span>
+      </div>
+      <p class="footer-thanks">Cảm ơn mọi người đã đồng hành và chung vui cùng chúng mình!</p>
+      <div class="footer-bottom">
+        Trần Thị Kim Oanh & Trịnh Đăng Chiến • Ninh Bình 2026
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       11. MOBILE BOTTOM NAVIGATION
+       ========================================================= -->
+  <nav class="mobile-nav">
+    <a href="#hero" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+      <span>Trang đầu</span>
+    </a>
+    <a href="#couple" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      <span>Hai họ</span>
+    </a>
+    <a href="#events" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      <span>Lịch trình</span>
+    </a>
+    <a href="#rsvp" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      <span>Tham dự</span>
+    </a>
+    <a href="#gift" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+      <span>Mừng cưới</span>
+    </a>
+  </nav>
+
+  <!-- =========================================================
+       12. BẢNG ĐIỀU KHIỂN QUẢN LÝ TỔNG HỢP (CONTROL CENTER MODAL)
+       Bao gồm 4 TAB:
+       - Tab 1: ✉️ Tạo link gửi đích danh cho khách (?to=Tên_Khách)
+       - Tab 2: 📸 Setup Ảnh (Hero, Chú Rể, Cô Dâu)
+       - Tab 3: 🎵 Setup Nhạc (Chọn bài kinh điển hoặc tải file MP3)
+       - Tab 4: ⚙️ Cài đặt thông tin & Ngân hàng
+       ========================================================= -->
+  <div id="control-modal" class="control-modal">
+    <div class="control-card">
+      <div class="control-header">
+        <h3 class="control-header-title">
+          <span>⚙️</span>
+          <span>Bảng Quản Lý Thiệp Cưới</span>
+        </h3>
+        <button id="control-close-btn" class="control-close-btn">&times;</button>
+      </div>
+
+      <!-- THANH CHUYỂN TAB -->
+      <div class="control-tabs-nav">
+        <button class="control-tab-btn active">✉️ Gửi Khách</button>
+        <button class="control-tab-btn">📸 Setup Ảnh</button>
+        <button class="control-tab-btn">🎵 Setup Nhạc</button>
+        <button class="control-tab-btn">⚙️ Thông Tin</button>
+      </div>
+
+      <div class="control-body">
+        <!-- TAB 1: TẠO LINK GỬI ĐÍCH DANH CHO TỪNG KHÁCH -->
+        <div class="control-tab-pane active">
+          <div style="text-align: center; margin-bottom: 16px;">
+            <span style="font-size: 2.2rem;">💌</span>
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--primary-green); margin: 4px 0;">
+              Tạo Thiệp Mời Đích Danh Cho Khách
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              Ghi tên người bạn muốn gửi, nhấn <strong>"Tạo Link Thiệp Mời"</strong>. Người nhận mở link sẽ thấy đúng tên mình trang trọng trên thiệp, không còn chữ chung chung!
+            </p>
+          </div>
+
+          <div class="form-group" style="text-align: left;">
+            <label class="form-label" for="input-guest-name">Họ và tên / Danh xưng khách mời:</label>
+            <input type="text" id="input-guest-name" class="form-input" placeholder="Ví dụ: Anh Tuấn, Chị Mai & Gia đình, Bạn Thân..." autofocus>
+          </div>
+
+          <!-- GỢI Ý XƯNG HÔ NHANH CHỈ 1 CHẠM -->
+          <div class="guest-quick-tags">
+            <span class="quick-tag" onclick="fillGuestName('Gia đình Bác ')">Gia đình Bác</span>
+            <span class="quick-tag" onclick="fillGuestName('Anh/Chị ')">Anh/Chị</span>
+            <span class="quick-tag" onclick="fillGuestName('Bạn ')">Bạn</span>
+            <span class="quick-tag" onclick="fillGuestName('Em ')">Em</span>
+            <span class="quick-tag" onclick="fillGuestName('Gia đình ')">Gia đình</span>
+          </div>
+
+          <button id="btn-generate-guest-link" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 4px;">
+            <span>✨ Tạo Link Thiệp Mời Ngay</span>
+          </button>
+
+          <!-- KHỐI KẾT QUẢ LINK ĐƯỢC TẠO -->
+          <div id="guest-link-result-box" class="guest-link-result-box" style="display: none;">
+            <label class="form-label" style="color: var(--primary-green); font-weight: 700;">Đường link riêng của khách:</label>
+            <div class="guest-link-input-wrap">
+              <input type="text" id="output-guest-link" class="form-input" readonly>
+              <button id="btn-copy-guest-link" class="btn-primary" style="white-space: nowrap; padding: 10px 18px;">
+                Sao chép
+              </button>
+            </div>
+
+            <div class="guest-link-actions">
+              <a id="btn-open-preview-guest" class="btn-secondary" href="#" target="_blank" style="flex: 1; justify-content: center;">
+                👁️ Xem thử thiệp
+              </a>
+              <a id="btn-share-zalo" class="btn-primary" href="#" target="_blank" style="flex: 1; justify-content: center; background: #0068ff;">
+                💬 Gửi qua Zalo
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: SETUP ẢNH CƯỚI -->
+        <div class="control-tab-pane">
+          <div style="margin-bottom: 14px;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--primary-green); margin-bottom: 4px;">
+              📸 Setup & Tùy Chỉnh Ảnh Cưới
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;">
+              Tải ảnh từ điện thoại hoặc máy tính. Ảnh sẽ được tự động làm nét và lưu trực tiếp để hiển thị ngay trên thiệp cưới:
+            </p>
+          </div>
+
+          <!-- DANH SÁCH CÁC VỊ TRÍ ẢNH -->
+          <div class="photo-setup-list">
+            <!-- 1. Ảnh Bìa Chính (Hero Banner) -->
+            <div class="photo-setup-card">
+              <div class="photo-card-thumb">
+                <img id="preview-hero-thumb" src="images/hero.jpg" alt="Ảnh bìa" onerror="this.src='images/hero.svg'">
+                <span class="photo-thumb-badge">Bìa Chính</span>
+              </div>
+              <div class="photo-card-info">
+                <div class="photo-card-title">1. Ảnh Bìa Đầu Trang (Hero Banner)</div>
+                <div class="photo-card-desc">Hiển thị lớn và trang trọng nhất ngay khi khách mở phong bì.</div>
+                <div class="photo-card-actions">
+                  <label class="btn-picker-label">
+                    <span>📁 Chọn ảnh</span>
+                    <input type="file" id="picker-hero-img" accept="image/*" style="display: none;">
+                  </label>
+                  <button type="button" class="btn-reset-photo" data-target="heroImage">Khôi phục</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Ảnh Chú Rể (Đăng Chiến) -->
+            <div class="photo-setup-card">
+              <div class="photo-card-thumb is-circle">
+                <img id="preview-groom-thumb" src="images/groom.jpg" alt="Chú rể" onerror="this.src='images/groom.svg'">
+                <span class="photo-thumb-badge">Chú Rể</span>
+              </div>
+              <div class="photo-card-info">
+                <div class="photo-card-title">2. Ảnh Chú Rể (Trịnh Đăng Chiến)</div>
+                <div class="photo-card-desc">Hiển thị tại mục giới thiệu Nhà Trai & Chú rể.</div>
+                <div class="photo-card-actions">
+                  <label class="btn-picker-label">
+                    <span>📁 Chọn ảnh</span>
+                    <input type="file" id="picker-groom-img" accept="image/*" style="display: none;">
+                  </label>
+                  <button type="button" class="btn-reset-photo" data-target="groomAvatar">Khôi phục</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Ảnh Cô Dâu (Kim Oanh) -->
+            <div class="photo-setup-card">
+              <div class="photo-card-thumb is-circle">
+                <img id="preview-bride-thumb" src="images/bride.jpg" alt="Cô dâu" onerror="this.src='images/bride.svg'">
+                <span class="photo-thumb-badge">Cô Dâu</span>
+              </div>
+              <div class="photo-card-info">
+                <div class="photo-card-title">3. Ảnh Cô Dâu (Trần Thị Kim Oanh)</div>
+                <div class="photo-card-desc">Hiển thị tại mục giới thiệu Nhà Gái & Cô dâu.</div>
+                <div class="photo-card-actions">
+                  <label class="btn-picker-label">
+                    <span>📁 Chọn ảnh</span>
+                    <input type="file" id="picker-bride-img" accept="image/*" style="display: none;">
+                  </label>
+                  <button type="button" class="btn-reset-photo" data-target="brideAvatar">Khôi phục</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mẹo lưu lâu dài -->
+          <div class="setup-tip-box">
+            <span class="tip-icon">💡</span>
+            <div class="tip-text">
+              <strong>Mẹo lưu ảnh vĩnh viễn cho tất cả khách mời:</strong><br>
+              Để mọi người mở link thiệp từ xa trên điện thoại đều thấy ảnh của hai bạn mà không phụ thuộc vào bộ nhớ máy, bạn chỉ cần copy ảnh vào thư mục <code>images/</code> trên máy tính (đặt tên <code>hero.jpg</code>, <code>groom.jpg</code>, <code>bride.jpg</code>) và lưu lên GitHub.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: SETUP NHẠC CƯỚI MP3 -->
+        <div class="control-tab-pane">
+          <div style="margin-bottom: 14px;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--primary-green); margin-bottom: 4px;">
+              🎵 Chọn Bài Hát Cưới Lãng Mạn
+            </h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;">
+              Chọn trong danh sách bài hát có sẵn (bấm nghe thử ngay) hoặc tải lên bài hát riêng của hai bạn:
+            </p>
+          </div>
+
+          <!-- BANNER BÀI HÁT ĐANG ÁP DỤNG -->
+          <div class="current-track-banner">
+            <div class="current-track-icon">🎶</div>
+            <div class="current-track-details">
+              <span class="current-track-label">Bài hát đang áp dụng:</span>
+              <span id="current-track-title" class="current-track-name">Canon in D - Romantic Piano (Bất hủ)</span>
+            </div>
+            <button id="btn-toggle-test-music" class="btn-test-play" type="button" title="Nghe thử bài đang áp dụng">
+              <span id="test-music-icon">▶</span>
+              <span id="test-music-text">Nghe thử</span>
+            </button>
+          </div>
+
+          <!-- DANH SÁCH BÀI HÁT TUYỂN CHỌN SẴN -->
+          <div class="preset-song-list">
+            <!-- Bài 1: Canon in D Piano -->
+            <div class="preset-song-item active" data-song-id="canon-in-d">
+              <div class="song-info">
+                <div class="song-title">🎹 Canon in D (Piano Romance)</div>
+                <div class="song-artist">Pachelbel • Hòa tấu Piano cổ điển (Phát 100% không sợ chặn mạng)</div>
+              </div>
+              <div class="song-actions">
+                <button type="button" class="btn-song-preview" data-preview-id="canon-in-d">▶ Nghe thử</button>
+                <button type="button" class="btn-song-select" data-select-id="canon-in-d">Đang chọn</button>
+              </div>
+            </div>
+
+            <!-- Bài 2: Ánh Nắng Của Anh -->
+            <div class="preset-song-item" data-song-id="anh-nang-cua-anh" data-url="https://assets.mixkit.co/music/preview/mixkit-romantic-piano-wedding-483.mp3">
+              <div class="song-info">
+                <div class="song-title">💍 Ánh Nắng Của Anh (Wedding Melodies)</div>
+                <div class="song-artist">Piano Romance • Tình ca lãng mạn ngày chung đôi</div>
+              </div>
+              <div class="song-actions">
+                <button type="button" class="btn-song-preview" data-preview-id="anh-nang-cua-anh">▶ Nghe thử</button>
+                <button type="button" class="btn-song-select" data-select-id="anh-nang-cua-anh">Chọn bài</button>
+              </div>
+            </div>
+
+            <!-- Bài 3: A Thousand Years -->
+            <div class="preset-song-item" data-song-id="a-thousand-years" data-url="https://assets.mixkit.co/music/preview/mixkit-wedding-waltz-481.mp3">
+              <div class="song-info">
+                <div class="song-title">🌸 A Thousand Years</div>
+                <div class="song-artist">Christina Perri • Giai điệu trăm năm hạnh phúc</div>
+              </div>
+              <div class="song-actions">
+                <button type="button" class="btn-song-preview" data-preview-id="a-thousand-years">▶ Nghe thử</button>
+                <button type="button" class="btn-song-select" data-select-id="a-thousand-years">Chọn bài</button>
+              </div>
+            </div>
+
+            <!-- Bài 4: Beautiful In White -->
+            <div class="preset-song-item" data-song-id="beautiful-in-white" data-url="https://assets.mixkit.co/music/preview/mixkit-serenade-of-love-485.mp3">
+              <div class="song-info">
+                <div class="song-title">🥂 Beautiful In White</div>
+                <div class="song-artist">Shane Filan • Bước chân cô dâu tiến vào lễ đường</div>
+              </div>
+              <div class="song-actions">
+                <button type="button" class="btn-song-preview" data-preview-id="beautiful-in-white">▶ Nghe thử</button>
+                <button type="button" class="btn-song-select" data-select-id="beautiful-in-white">Chọn bài</button>
+              </div>
+            </div>
+
+            <!-- Bài 5: Until I Found You -->
+            <div class="preset-song-item" data-song-id="until-i-found-you" data-url="https://assets.mixkit.co/music/preview/mixkit-sweet-love-melody-484.mp3">
+              <div class="song-info">
+                <div class="song-title">✨ Until I Found You</div>
+                <div class="song-artist">Stephen Sanchez • Ngọt ngào & Sâu lắng</div>
+              </div>
+              <div class="song-actions">
+                <button type="button" class="btn-song-preview" data-preview-id="until-i-found-you">▶ Nghe thử</button>
+                <button type="button" class="btn-song-select" data-select-id="until-i-found-you">Chọn bài</button>
+              </div>
+            </div>
+
+            <!-- Bài 6: Cưới Nhau Đi (Yes I Do) -->
+            <div class="preset-song-item" data-song-id="cuoi-nhau-di" data-url="https://assets.mixkit.co/music/preview/mixkit-happy-wedding-day-482.mp3">
+              <div class="song-info">
+                <div class="song-title">💖 Cưới Nhau Đi (Yes I Do)</div>
+                <div class="song-artist">Bùi Anh Tuấn & Hiền Hồ • Hân hoan ngày đại hỷ</div>
+              </div>
+              <div class="song-actions">
+                <button type="button" class="btn-song-preview" data-preview-id="cuoi-nhau-di">▶ Nghe thử</button>
+                <button type="button" class="btn-song-select" data-select-id="cuoi-nhau-di">Chọn bài</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- HOẶC CHỌN FILE MP3 TỪ MÁY -->
+          <div style="margin-top: 14px; padding: 14px; background: #fbfdfa; border: 1px dashed var(--primary-green); border-radius: var(--radius-md);">
+            <div style="font-weight: 700; color: var(--deep-forest); font-size: 0.88rem; margin-bottom: 4px;">
+              📁 Hoặc Tải Lên File Nhạc MP3 Của Riêng Hai Bạn:
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px;">
+              Hỗ trợ file định dạng (.mp3, .m4a, .wav) từ điện thoại hoặc máy tính:
+            </p>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <label class="btn-picker-label" style="padding: 7px 16px; font-size: 0.82rem;">
+                <span>📂 Chọn file MP3 từ máy</span>
+                <input type="file" id="picker-music-file" accept="audio/*" style="display: none;">
+              </label>
+              <span id="uploaded-music-name" style="font-size: 0.8rem; color: var(--primary-green); font-weight: 600;"></span>
+            </div>
+          </div>
+
+          <!-- Mẹo lâu dài -->
+          <div class="setup-tip-box" style="margin-top: 12px;">
+            <span class="tip-icon">💡</span>
+            <div class="tip-text">
+              <strong>Mẹo phát nhạc vĩnh viễn cho tất cả khách mời:</strong><br>
+              Để mọi người mở link thiệp từ xa trên điện thoại đều nghe được bài hát của hai bạn, hãy copy file bài hát vào thư mục <code>audio/</code> trong máy tính, đổi tên thành <code>wedding.mp3</code> và lưu lên GitHub.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: THÔNG TIN CẶP ĐÔI & TÀI KHOẢN -->
+        <div class="control-tab-pane">
+          <div class="form-group">
+            <label class="form-label">Họ Tên Cô Dâu</label>
+            <input type="text" id="edit-bride-name" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Họ Tên Chú Rể</label>
+            <input type="text" id="edit-groom-name" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thời gian lễ cưới (đếm ngược)</label>
+            <input type="datetime-local" id="edit-wedding-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số TK Chú Rể (MBBank)</label>
+            <input type="text" id="edit-groom-bank-num" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số TK Cô Dâu (Vietcombank)</label>
+            <input type="text" id="edit-bride-bank-num" class="form-input">
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button id="customizer-save-btn" class="btn-primary" style="flex: 1; justify-content: center;">
+              <span>Lưu Thông Tin</span>
+            </button>
+            <button id="customizer-reset-btn" class="btn-secondary">
+              <span>Đặt lại</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-notice" class="toast-notice"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
